@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolatore Ricarica Auto Elettrica</title>
+    <style>
+        /* CSS Reset e Variabili di Design */
+        :root {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #0f172a;
+            --border-color: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-emerald: #10b981;
+            --accent-sky: #0ea5e9;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px 12px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        /* Header Style */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            background: linear-gradient(135deg, var(--accent-emerald), var(--accent-sky));
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .brand-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: #ffffff;
+        }
+
+        .brand-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--accent-emerald), var(--accent-sky));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .btn-reset {
+            background: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-reset:hover {
+            border-color: var(--accent-emerald);
+            color: var(--accent-emerald);
+        }
+
+        /* Grid System */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        @media (min-width: 900px) {
+            .grid-layout {
+                grid-template-columns: 1.2fr 0.8fr;
+            }
+        }
+
+        /* Card System */
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .card:last-child {
+            margin-bottom: 0;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+
+        .card-header svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: var(--text-main);
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        .badge-emerald { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); }
+        .badge-amber { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+        .badge-rose { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+
+        input[type="number"], select, input[type="time"] {
+            width: 100%;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus, select:focus, input[type="time"]:focus {
+            border-color: var(--accent-emerald);
+        }
+
+        /* Range Sliders */
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent-emerald);
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+        }
+
+        .range-target::-webkit-slider-thumb {
+            background: var(--accent-sky) !important;
+            box-shadow: 0 0 8px rgba(14, 165, 233, 0.6) !important;
+        }
+
+        /* Preset Buttons */
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .btn-preset {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 8px 0;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-preset.active {
+            background: rgba(245, 158, 11, 0.15);
+            border-color: var(--accent-amber);
+            color: var(--accent-amber);
+        }
+
+        /* Progress Bar Preview */
+        .battery-bar-container {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        .battery-bar {
+            height: 14px;
+            background: var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .bar-fill-current { background: var(--accent-emerald); height: 100%; transition: width 0.3s; }
+        .bar-fill-needed { background: rgba(14, 165, 233, 0.5); height: 100%; transition: width 0.3s; }
+
+        .battery-bar-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        /* Result Panel */
+        .summary-card {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 1px solid #334155;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-title {
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            color: var(--accent-emerald);
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .main-duration {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1;
+            margin-bottom: 20px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
+        }
+
+        .result-item-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .result-item-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .text-emerald { color: var(--accent-emerald); }
+        .text-sky { color: var(--accent-sky); }
+        .text-amber { color: var(--accent-amber); }
+
+        /* SVG Chart */
+        .chart-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 0;
+        }
+
+        .chart-svg {
+            width: 160px;
+            height: 160px;
+            transform: rotate(-90deg);
+        }
+
+        .chart-bg {
+            fill: none;
+            stroke: var(--border-color);
+            stroke-width: 24;
+        }
+
+        .chart-net {
+            fill: none;
+            stroke: var(--accent-emerald);
+            stroke-width: 24;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 100;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .chart-loss {
+            fill: none;
+            stroke: var(--accent-rose);
+            stroke-width: 24;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 400;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 12px;
+            font-size: 0.8rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .details-list {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .details-row:last-child {
+            margin-bottom: 0;
+            padding-top: 6px;
+            border-top: 1px dashed var(--border-color);
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .tip-box {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            font-size: 0.78rem;
+            color: var(--accent-emerald);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Intestazione -->
+        <header>
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg viewBox="0 0 24 24"><path d="M11 15H6l7-14v8h5l-7 14v-8z"/></svg>
+                </div>
+                <div>
+                    <div class="brand-title">EV ChargePlanner</div>
+                    <div class="brand-sub">Calcolatore & Programmazione Ricarica Elettrica</div>
+                </div>
+            </div>
+            <button class="btn-reset" id="btnReset">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                Ripristina Default
+            </button>
+        </header>
+
+        <div class="grid-layout">
+            
+            <!-- COLONNA SINISTRA: INPUT -->
+            <div>
+                <!-- Card 1: Batteria -->
+                <div class="card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-emerald)" stroke-width="2"><rect x="2" y="7" width="16" height="10" rx="2"/><path d="M22 11v2"/></svg>
+                        Batteria Veicolo
+                    </div>
+
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label for="batteryCapacity">Capacità Batteria (kWh)</label>
+                            <span class="badge badge-emerald"><span id="capacityVal">18.4</span> kWh</span>
+                        </div>
+                        <input type="number" id="batteryCapacity" step="0.1" value="18.4" min="1" max="150">
+                    </div>
+
+                    <div class="form-group" style="margin-top: 16px;">
+                        <div class="label-row">
+                            <span>Carica Attuale: <b id="lblCurSoc" class="text-emerald">20%</b></span>
+                            <span>Carica Desiderata: <b id="lblTgtSoc" class="text-sky">100%</b></span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px;">
+                            <input type="range" id="currentSoc" min="0" max="100" value="20">
+                            <input type="range" id="targetSoc" min="0" max="100" value="100" class="range-target">
+                        </div>
+                    </div>
+
+                    <!-- Anteprima Bipasto Carica -->
+                    <div class="battery-bar-container">
+                        <div class="battery-bar">
+                            <div class="bar-fill-current" id="barCurrent" style="width: 20%;"></div>
+                            <div class="bar-fill-needed" id="barNeeded" style="width: 80%;"></div>
+                        </div>
+                        <div class="battery-bar-labels">
+                            <span>Attuale: <strong id="lblCurrentKwh">3.68 kWh</strong></span>
+                            <span>Mancante: <strong id="lblNeededKwh">14.72 kWh</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Potenza & Corrente -->
+                <div class="card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-amber)" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                        Parametri di Carica
+                    </div>
+
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label>Amperaggio (A)</label>
+                            <span class="badge badge-amber"><span id="ampsVal">6</span> A</span>
+                        </div>
+                        <div class="preset-grid">
+                            <button class="btn-preset active" data-amp="6">6A</button>
+                            <button class="btn-preset" data-amp="8">8A</button>
+                            <button class="btn-preset" data-amp="10">10A</button>
+                            <button class="btn-preset" data-amp="13">13A</button>
+                            <button class="btn-preset" data-amp="16">16A</button>
+                            <button class="btn-preset" data-amp="32">32A</button>
+                        </div>
+                        <input type="number" id="chargingAmps" value="6" min="1" max="64">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px;">
+                        <div class="form-group">
+                            <div class="label-row"><label for="voltage">Tensione</label></div>
+                            <select id="voltage">
+                                <option value="230" selected>230 V (Domestica)</option>
+                                <option value="400">400 V (Industriale)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="label-row"><label for="phases">Fasi</label></div>
+                            <select id="phases">
+                                <option value="1" selected>Monofase (1x)</option>
+                                <option value="3">Trifase (3x)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 14px;">
+                        <div class="label-row">
+                            <label for="efficiencyLoss">Dispersione AC/DC (%)</label>
+                            <span class="badge badge-rose"><span id="lossVal">10</span>% perdita</span>
+                        </div>
+                        <input type="range" id="efficiencyLoss" min="0" max="30" value="10">
+                    </div>
+                </div>
+
+                <!-- Card 3: Costo & Programmazione -->
+                <div class="card">
+                    <div class="card-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-sky)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Programmazione & Costo
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <div class="label-row"><label for="energyCost">Prezzo (€/kWh)</label></div>
+                            <input type="number" id="energyCost" step="0.01" value="0.25" min="0">
+                        </div>
+                        <div class="form-group">
+                            <div class="label-row"><label for="scheduleMode">Modalità</label></div>
+                            <select id="scheduleMode">
+                                <option value="start">Ora Inizio</option>
+                                <option value="end">Ora Fine Desiderata</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 12px;">
+                        <div class="label-row"><label id="timeLabel" for="timeInput">Ora di Inizio Ricarica</label></div>
+                        <input type="time" id="timeInput">
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLONNA DESTRA: RISULTATI -->
+            <div>
+                <!-- Pannello Riepilogo -->
+                <div class="card summary-card">
+                    <div class="summary-title">Tempo Stimato di Ricarica</div>
+                    <div class="main-duration" id="resDuration">--h --m</div>
+
+                    <div class="results-grid">
+                        <div>
+                            <div class="result-item-label">Potenza Erogata</div>
+                            <div class="result-item-value text-emerald" id="resPower">0.00 kW</div>
+                        </div>
+                        <div>
+                            <div class="result-item-label">Energia dalla Rete</div>
+                            <div class="result-item-value text-sky" id="resEnergyGrid">0.00 kWh</div>
+                        </div>
+                        <div>
+                            <div class="result-item-label" id="resTimeHeader">Ora Completamento</div>
+                            <div class="result-item-value text-amber" id="resScheduleTime">--:--</div>
+                        </div>
+                        <div>
+                            <div class="result-item-label">Costo Totale</div>
+                            <div class="result-item-value text-emerald" id="resTotalCost">€ 0.00</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grafico Vettoriale SVG Inline -->
+                <div class="card">
+                    <div class="card-header" style="justify-content: space-between;">
+                        <span>Ripartizione Energia</span>
+                        <small style="color: var(--text-muted); font-size: 0.75rem;">SVG Autonomo</small>
+                    </div>
+
+                    <div class="chart-container">
+                        <svg class="chart-svg" viewBox="0 0 180 180">
+                            <circle class="chart-bg" cx="90" cy="90" r="70"></circle>
+                            <circle class="chart-net" id="svgCircleNet" cx="90" cy="90" r="70"></circle>
+                            <circle class="chart-loss" id="svgCircleLoss" cx="90" cy="90" r="70"></circle>
+                        </svg>
+
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <div class="dot" style="background: var(--accent-emerald);"></div>
+                                <span>Utile (<b id="lblNetKwhVal">0</b> kWh)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="dot" style="background: var(--accent-rose);"></div>
+                                <span>Dispersione (<b id="lblLossKwhVal">0</b> kWh)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="details-list">
+                        <div class="details-row">
+                            <span>Energia utile in batteria:</span>
+                            <span id="dtlNet">0 kWh</span>
+                        </div>
+                        <div class="details-row">
+                            <span>Energia persa (calore/AC-DC):</span>
+                            <span id="dtlLoss" style="color: var(--accent-rose);">0 kWh</span>
+                        </div>
+                        <div class="details-row">
+                            <span>Costo effettivo per kWh utile:</span>
+                            <span id="dtlRate">0.00 €/kWh</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tip-box">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="shrink: 0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    <div>
+                        <strong>Consiglio batteria:</strong> Mantenere il livello di carica quotidiano tra il 20% e l'80% estende la vita utile della batteria del veicolo elettrico.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Riferimenti agli elementi del DOM
+        const inputs = {
+            batteryCapacity: document.getElementById('batteryCapacity'),
+            capacityVal: document.getElementById('capacityVal'),
+            currentSoc: document.getElementById('currentSoc'),
+            targetSoc: document.getElementById('targetSoc'),
+            lblCurSoc: document.getElementById('lblCurSoc'),
+            lblTgtSoc: document.getElementById('lblTgtSoc'),
+            barCurrent: document.getElementById('barCurrent'),
+            barNeeded: document.getElementById('barNeeded'),
+            lblCurrentKwh: document.getElementById('lblCurrentKwh'),
+            lblNeededKwh: document.getElementById('lblNeededKwh'),
+            
+            chargingAmps: document.getElementById('chargingAmps'),
+            ampsVal: document.getElementById('ampsVal'),
+            voltage: document.getElementById('voltage'),
+            phases: document.getElementById('phases'),
+            efficiencyLoss: document.getElementById('efficiencyLoss'),
+            lossVal: document.getElementById('lossVal'),
+            
+            energyCost: document.getElementById('energyCost'),
+            scheduleMode: document.getElementById('scheduleMode'),
+            timeLabel: document.getElementById('timeLabel'),
+            timeInput: document.getElementById('timeInput'),
+            
+            resDuration: document.getElementById('resDuration'),
+            resPower: document.getElementById('resPower'),
+            resEnergyGrid: document.getElementById('resEnergyGrid'),
+            resTimeHeader: document.getElementById('resTimeHeader'),
+            resScheduleTime: document.getElementById('resScheduleTime'),
+            resTotalCost: document.getElementById('resTotalCost'),
+            
+            svgCircleNet: document.getElementById('svgCircleNet'),
+            svgCircleLoss: document.getElementById('svgCircleLoss'),
+            lblNetKwhVal: document.getElementById('lblNetKwhVal'),
+            lblLossKwhVal: document.getElementById('lblLossKwhVal'),
+            dtlNet: document.getElementById('dtlNet'),
+            dtlLoss: document.getElementById('dtlLoss'),
+            dtlRate: document.getElementById('dtlRate'),
+            
+            btnReset: document.getElementById('btnReset'),
+            btnPresets: document.querySelectorAll('.btn-preset')
+        };
+
+        // Imposta orario di sistema di default
+        const now = new Date();
+        inputs.timeInput.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+        // Funzione principale di calcolo
+        function calculate() {
+            const capacity = parseFloat(inputs.batteryCapacity.value) || 18.4;
+            let curSoc = parseInt(inputs.currentSoc.value);
+            let tgtSoc = parseInt(inputs.targetSoc.value);
+
+            // Validazione sequenza Soc
+            if (curSoc > tgtSoc) {
+                curSoc = tgtSoc;
+                inputs.currentSoc.value = curSoc;
+            }
+
+            const amps = parseFloat(inputs.chargingAmps.value) || 6;
+            const volts = parseFloat(inputs.voltage.value) || 230;
+            const phases = parseInt(inputs.phases.value) || 1;
+            const lossPercent = parseFloat(inputs.efficiencyLoss.value) || 10;
+            const costPerKwh = parseFloat(inputs.energyCost.value) || 0;
+
+            // Aggiornamento etichette dinamiche
+            inputs.capacityVal.textContent = capacity.toFixed(1);
+            inputs.lblCurSoc.textContent = `${curSoc}%`;
+            inputs.lblTgtSoc.textContent = `${tgtSoc}%`;
+            inputs.ampsVal.textContent = amps;
+            inputs.lossVal.textContent = lossPercent;
+
+            // Calcolo kWh
+            const currentKwh = capacity * (curSoc / 100);
+            const targetKwh = capacity * (tgtSoc / 100);
+            const netKwhNeeded = Math.max(0, targetKwh - currentKwh);
+
+            const efficiency = (100 - lossPercent) / 100;
+            const grossKwhGrid = efficiency > 0 ? (netKwhNeeded / efficiency) : 0;
+            const lossKwh = grossKwhGrid - netKwhNeeded;
+
+            // Calcolo Potenza kW
+            let powerKW = 0;
+            if (phases === 3) {
+                powerKW = (volts * amps * Math.sqrt(3)) / 1000;
+            } else {
+                powerKW = (volts * amps) / 1000;
+            }
+
+            const effectivePowerKW = powerKW * efficiency;
+
+            // Calcolo Tempo
+            let hours = 0;
+            if (effectivePowerKW > 0) {
+                hours = netKwhNeeded / effectivePowerKW;
+            }
+
+            const hInt = Math.floor(hours);
+            let mInt = Math.round((hours - hInt) * 60);
+            let finalH = hInt;
+            if (mInt === 60) {
+                finalH += 1;
+                mInt = 0;
+            }
+
+            // Calcolo Costo
+            const totalCost = grossKwhGrid * costPerKwh;
+            const effectiveRate = netKwhNeeded > 0 ? (totalCost / netKwhNeeded) : costPerKwh;
+
+            // Aggiornamento UI
+            inputs.lblCurrentKwh.textContent = `${currentKwh.toFixed(2)} kWh`;
+            inputs.lblNeededKwh.textContent = `${netKwhNeeded.toFixed(2)} kWh`;
+            inputs.barCurrent.style.width = `${curSoc}%`;
+            inputs.barNeeded.style.width = `${tgtSoc - curSoc}%`;
+
+            inputs.resDuration.textContent = `${finalH}h ${mInt}m`;
+            inputs.resPower.textContent = `${powerKW.toFixed(2)} kW`;
+            inputs.resEnergyGrid.textContent = `${grossKwhGrid.toFixed(2)} kWh`;
+            inputs.resTotalCost.textContent = `€ ${totalCost.toFixed(2)}`;
+
+            inputs.dtlNet.textContent = `${netKwhNeeded.toFixed(2)} kWh`;
+            inputs.dtlLoss.textContent = `${lossKwh.toFixed(2)} kWh`;
+            inputs.dtlRate.textContent = `€ ${effectiveRate.toFixed(3)} / kWh`;
+            inputs.lblNetKwhVal.textContent = netKwhNeeded.toFixed(1);
+            inputs.lblLossKwhVal.textContent = lossKwh.toFixed(1);
+
+            // Calcolo Programmazione Orario
+            if (inputs.timeInput.value) {
+                const [h, m] = inputs.timeInput.value.split(':').map(Number);
+                const date = new Date();
+                date.setHours(h, m, 0, 0);
+
+                if (inputs.scheduleMode.value === 'start') {
+                    inputs.resTimeHeader.textContent = "Ora Completamento";
+                    date.setMinutes(date.getMinutes() + Math.round(hours * 60));
+                } else {
+                    inputs.resTimeHeader.textContent = "Ora Inizio Consigliata";
+                    date.setMinutes(date.getMinutes() - Math.round(hours * 60));
+                }
+
+                inputs.resScheduleTime.textContent = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+            }
+
+            // Aggiornamento Grafico SVG Circolare
+            updateSvgChart(netKwhNeeded, lossKwh);
+        }
+
+        // Funzione per disegnare l'SVG senza librerie
+        function updateSvgChart(net, loss) {
+            const total = net + loss;
+            const circumference = 2 * Math.PI * 70; // r = 70 -> ~439.8
+
+            if (total === 0) {
+                inputs.svgCircleNet.style.strokeDashoffset = circumference;
+                inputs.svgCircleLoss.style.strokeDashoffset = circumference;
+                return;
+            }
+
+            const netPercent = net / total;
+            const lossPercent = loss / total;
+
+            const netOffset = circumference * (1 - netPercent);
+            const lossOffset = circumference * (1 - lossPercent);
+
+            inputs.svgCircleNet.style.strokeDasharray = circumference;
+            inputs.svgCircleNet.style.strokeDashoffset = netOffset;
+
+            inputs.svgCircleLoss.style.strokeDasharray = circumference;
+            inputs.svgCircleLoss.style.strokeDashoffset = lossOffset;
+            
+            // Ruota la sezione di perdita per affiancarla
+            const rotationAngle = (netPercent * 360) - 90;
+            inputs.svgCircleLoss.style.transformOrigin = 'center';
+            inputs.svgCircleLoss.style.transform = `rotate(${rotationAngle}deg)`;
+        }
+
+        // Event Listener per tutti gli input
+        Object.values(inputs).forEach(input => {
+            if (input && input.tagName) {
+                input.addEventListener('input', calculate);
+                input.addEventListener('change', calculate);
+            }
+        });
+
+        // Toggle modalità orario
+        inputs.scheduleMode.addEventListener('change', () => {
+            inputs.timeLabel.textContent = inputs.scheduleMode.value === 'start' 
+                ? "Ora di Inizio Ricarica" 
+                : "Ora Desiderata di Fine Ricarica";
+            calculate();
+        });
+
+        // Pulsanti Preset Amperaggio
+        inputs.btnPresets.forEach(btn => {
+            btn.addEventListener('click', () => {
+                inputs.btnPresets.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                inputs.chargingAmps.value = btn.getAttribute('data-amp');
+                calculate();
+            });
+        });
+
+        // Ripristino valori di Default
+        inputs.btnReset.addEventListener('click', () => {
+            inputs.batteryCapacity.value = 18.4;
+            inputs.currentSoc.value = 20;
+            inputs.targetSoc.value = 100;
+            inputs.chargingAmps.value = 6;
+            inputs.voltage.value = 230;
+            inputs.phases.value = 1;
+            inputs.efficiencyLoss.value = 10;
+            inputs.energyCost.value = 0.25;
+            inputs.scheduleMode.value = 'start';
+            inputs.timeLabel.textContent = "Ora di Inizio Ricarica";
+            
+            inputs.btnPresets[0].click();
+            calculate();
+        });
+
+        // Calcolo iniziale
+        calculate();
+    </script>
+</body>
+</html>
